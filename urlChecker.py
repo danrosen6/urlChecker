@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()  # This loads the .env file at the project root
-api_key = os.getenv("apiKey")
+api_key = os.getenv("my_api_key")
 
 def get_virus_total_report(url):
     headers = {'x-apikey': api_key}
