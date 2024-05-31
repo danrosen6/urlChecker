@@ -2,6 +2,7 @@ import requests
 from requests.exceptions import RequestException
 from dotenv import load_dotenv
 import os
+import time
 
 # Load environment variables from a .env file located in the same directory as this script to keep sensitive data secure.
 load_dotenv()
@@ -35,7 +36,7 @@ def fetch_analysis_results(analysis_id, headers):
         # Make a GET request to retrieve the detailed analysis results.
         response = requests.get(analysis_url, headers=headers)
         if response.status_code == 200:
-            return summarize_analysis(response.json())
+            return summarize_analysis(response.json(), headers)
         else:
             print(f"Failed to fetch analysis results: {response.status_code}")
             return None
@@ -44,10 +45,18 @@ def fetch_analysis_results(analysis_id, headers):
         print(f"An error occurred: {e}")
         return None
     
-def summarize_analysis(json_data):
+def summarize_analysis(json_data, headers):
     # Extract and summarize the relevant data from the JSON response.
     try:
         analysis_info = json_data['data']['attributes']
+        status = analysis_info['status']
+        
+        # Check if the analysis status is 'queued'
+        if status == 'queued':
+            print("Analysis is queued. Waiting to retry...")
+            time.sleep(30)  # Wait for 30 seconds before retrying
+            return fetch_analysis_results(json_data['data']['id'], headers)
+
         results = analysis_info['results']
         stats = analysis_info['stats']
         url_info = json_data['meta']['url_info']
@@ -87,13 +96,3 @@ def display_detailed_report(results):
     for engine, details in results.items():
         print(f"{engine}: Category - {details['category']}, Result - {details['result']}")
 
-def main():
-    # User input for URL to be checked.
-    user_url = input("Enter the URL to check: ")
-    
-    # Function call to begin the process of obtaining and displaying the VirusTotal report.
-    get_virus_total_report(user_url)
-
-# Ensure that main function is called only when the script is executed directly, not when imported.
-if __name__ == "__main__":
-    main()
