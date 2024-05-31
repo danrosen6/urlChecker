@@ -1,48 +1,86 @@
-1. Install virtual environment
-pip install virtualenv
+Project Setup Guide
 
-2. Create a Virtual Environment:
-Navigate to your project directory and run:
-virtualenv venv
+1. Install Virtual Environment
 
-3. Activate the Virtual Environment:
-3.a In bash
-source venv/bin/activate
+    First, you need to install the `virtualenv` package if 
+    it is not already installed. This package allows you to 
+    create isolated Python environments. Run the following 
+    command in your terminal:
 
-3.b.1 For windows: If you don't want to change the global execution policy, 
-you can alternatively run PowerShell with the execution policy 
-temporarily adjusted for just that session:
-powershell -ExecutionPolicy Bypass
+    pip install virtualenv
 
-3.b.2 In batch
-venv\Scripts\activate
 
-4. Ensure Your Virtual Environment is Activated:
-You should see the name of your virtual environment (e.g., (venv))
-at the beginning of your command line prompt. This indicates that 
-any Python packages you install will only affect this virtual environment, 
-rather than your global Python installation.
+2. Create a Virtual Environment
 
-5. To install all dependencies 
-in bash and batch
-pip install -r requirements.txt 
+    Navigate to your project directory in the terminal. 
+    Create a virtual environment named `venv` by running:
 
-To generate a requirements.txt 
-in bash and batch
-pip freeze > requirements.txt
+    In terminal enter:
+        virtualenv venv
 
-6. Create .env file
-create variable my_api_key and set it equal to the api key within a string
+    This command creates a directory named `venv` where the 
+    virtual environment files are stored.
 
-7. To run a file in terminal type. This is required due to the use of the venv
-python fileName.py
 
-For this code enter:
-python main.py
+3. Activate the Virtual Environment
 
-VirusTotal API
-Standard free public API
-Usage	Must not be used in business workflows, commercial products or services.
-Request rate	4 lookups / min
-Daily quota	500 lookups / day
-Monthly quota	15.5 K lookups / month
+    To activate the virtual environment, use the appropriate
+    command for your operating system:
+
+    For Bash (Linux/macOS):
+        source venv/bin/activate
+
+    For Windows:
+
+        Using PowerShell without changing the global 
+        execution policy. Run PowerShell with the execution policy
+        temporarily adjusted for just that session. This can be done 
+        from the same terminal. Enter the following:
+            powershell -ExecutionPolicy Bypass
+
+        Then enter the following:
+            venv\Scripts\activate
+
+
+4. Ensure Your Virtual Environment is Activated
+
+    After activation, you should see `(venv)` at the beginning of your
+    command line prompt. This indicates that the virtual environment is 
+    active, and any Python packages installed will only affect this 
+    virtual environment.
+
+5. Install Project Dependencies
+
+    Install all required dependencies using the following command:
+        pip install -r requirements.txt
+
+    To generate a `requirements.txt` file that lists all current 
+    project dependencies, run:
+        pip freeze > requirements.txt
+
+6. Create a `.env` File
+
+    Create a `.env` file in your project directory. Add configuration 
+    settings and secrets here. This will be sued to store the api
+    for VirusTotal.
+        my_api_key="YOUR_API_KEY_HERE"
+
+7. Running Your Application
+
+    With the virtual environment activated, run Python scripts as follows.
+    This ensures that the script uses the correct environment settings:
+
+    Example:
+    python fileName.py
+
+    For this specific project, start with:
+        python main.py
+
+VirusTotal API Information
+
+    Type: Standard free public API
+    Usage Restrictions: Must not be used in business workflows, 
+        commercial products, or services.
+    Request Rate: 4 lookups per minute
+    Daily Quota: 500 lookups per day
+    Monthly Quota: 15,500 lookups per month
