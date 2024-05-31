@@ -1,52 +1,51 @@
 import requests
+from requests.exceptions import RequestException
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from a .env file located in the same directory as this script.
+# Load environment variables from a .env file located in the same directory as this script to keep sensitive data secure.
 load_dotenv()
 
-# Retrieve the API key stored in an environment variable for added security.
+# Retrieve the API key stored in an environment variable for added security. Ensure 'my_api_key' is correctly set in your .env file.
 api_key = os.getenv("my_api_key")
 
 def get_virus_total_report(url):
-    # Headers dictionary containing the API key necessary for authentication with the VirusTotal API.
+    # Prepare headers with the API key for authentication purposes when making requests to the VirusTotal API.
     headers = {'x-apikey': api_key}
     
-    # Data dictionary containing the URL to be analyzed.
+    # The data dictionary holds the URL to be analyzed, prepared for the POST request.
     data = {'url': url}
     
-    # Send a POST request to the VirusTotal API to submit the URL for analysis.
+    # Perform a POST request to the VirusTotal API to submit the URL for initial analysis and obtain an analysis ID.
     response = requests.post('https://www.virustotal.com/api/v3/urls', headers=headers, data=data)
 
-    # Check if the response status code is 200 (OK), which means the request was successful.
+    # Successful response check; continue to retrieve detailed analysis using the received analysis ID.
     if response.status_code == 200:
-        # Extract the analysis ID from the response to use in a subsequent request.
         analysis_id = response.json().get('data', {}).get('id')
-        # Fetch detailed analysis results using the analysis ID.
         return fetch_analysis_results(analysis_id, headers)
     else:
-        # Print an error message if the request was not successful.
+        # Handle unsuccessful responses by logging the HTTP status code.
         print(f"Failed to fetch data: {response.status_code}")
         return None
 
 def fetch_analysis_results(analysis_id, headers):
-    # Construct the URL to fetch the analysis results using the analysis ID.
+    # Construct the specific URL to fetch the detailed analysis results using the obtained analysis ID.
     analysis_url = f"https://www.virustotal.com/api/v3/analyses/{analysis_id}"
-    
-    # Send a GET request to retrieve the detailed analysis results.
-    response = requests.get(analysis_url, headers=headers)
-    
-    # Check if the response status code is 200 (OK).
-    if response.status_code == 200:
-        # Return the JSON response containing the analysis results.
-        return summarize_analysis(response.json())
-    else:
-        # Print an error message if the request to fetch analysis results was not successful.
-        print(f"Failed to fetch analysis results: {response.status_code}")
+    try:
+        # Make a GET request to retrieve the detailed analysis results.
+        response = requests.get(analysis_url, headers=headers)
+        if response.status_code == 200:
+            return summarize_analysis(response.json())
+        else:
+            print(f"Failed to fetch analysis results: {response.status_code}")
+            return None
+    except RequestException as e:
+        # Log any exceptions that occur during the GET request, typically related to network issues.
+        print(f"An error occurred: {e}")
         return None
     
 def summarize_analysis(json_data):
-        
+    # Extract and summarize the relevant data from the JSON response.
     try:
         analysis_info = json_data['data']['attributes']
         results = analysis_info['results']
@@ -62,12 +61,13 @@ def summarize_analysis(json_data):
         if prompt_for_detail():
             display_detailed_report(results)
     except KeyError as e:
+        # Handle missing keys in JSON response, which might indicate changes in API response structure.
         print(f"Missing key in JSON data: {e}")
 
 def prompt_for_detail():
     """
-    Prompts the user to decide if they want a more detailed report.
-    Returns True if user wants more details, False otherwise.
+    Prompt the user to decide if they want a more detailed report.
+    Return True if the user wants more details, False otherwise.
     """
     while True:
         user_input = input("Do you want a more detailed report? (y/n): ").lower()
@@ -80,19 +80,20 @@ def prompt_for_detail():
 
 def display_detailed_report(results):
     """
-    Displays a detailed report based on the results dictionary.
+    Displays a detailed report based on the results dictionary provided by the analysis.
+    Each antivirus engine result is listed with its category and detection result.
     """
     print("Detailed Report:")
     for engine, details in results.items():
         print(f"{engine}: Category - {details['category']}, Result - {details['result']}")
-           
+
 def main():
-    # Prompt the user to enter a URL to check.
+    # User input for URL to be checked.
     user_url = input("Enter the URL to check: ")
     
-    # Call the function to get the virus total report for the entered URL.
+    # Function call to begin the process of obtaining and displaying the VirusTotal report.
     get_virus_total_report(user_url)
 
-# This ensures the main function is executed only when the script is run directly, not when imported.
+# Ensure that main function is called only when the script is executed directly, not when imported.
 if __name__ == "__main__":
     main()
