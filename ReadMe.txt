@@ -34,8 +34,11 @@ pip freeze > requirements.txt
 6. Create .env file
 create variable my_api_key and set it equal to the api key within a string
 
-7. To run the file in terminal type
+7. To run a file in terminal type. This is required due to the use of the venv
 python fileName.py
+
+For this code enter:
+python main.py
 
 VirusTotal API
 Standard free public API
