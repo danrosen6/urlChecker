@@ -3,6 +3,7 @@ from requests.exceptions import RequestException
 from dotenv import load_dotenv
 import os
 import time
+from continue_prompt import prompt_to_continue
 
 # Load environment variables from a .env file located in the same directory as this script to keep sensitive data secure.
 load_dotenv()
@@ -73,13 +74,14 @@ def summarize_analysis(json_data, headers, attempt):
         print("Statistics:")
         print(f"Harmless: {stats['harmless']}, Malicious: {stats['malicious']}, Suspicious: {stats['suspicious']}, Undetected: {stats['undetected']}")
 
-        if prompt_for_detail():
+        print("Do you want a more detailed report? (y/n): ")
+        if prompt_to_continue():
             display_detailed_report(results)
     except KeyError as e:
         # Handle missing keys in JSON response, which might indicate changes in API response structure.
         print(f"Missing key in JSON data: {e}")
 
-def prompt_for_detail():
+'''def prompt_for_detail():
     """
     Prompt the user to decide if they want a more detailed report.
     Return True if the user wants more details, False otherwise.
@@ -91,7 +93,7 @@ def prompt_for_detail():
         elif user_input == 'n':
             return False
         else:
-            print("Invalid input, please enter 'y' or 'n'.")
+            print("Invalid input, please enter 'y' or 'n'.")'''
 
 def display_detailed_report(results):
     """
