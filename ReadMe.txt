@@ -36,3 +36,10 @@ create variable my_api_key and set it equal to the api key within a string
 
 7. To run the file in terminal type
 python fileName.py
+
+VirusTotal API
+Standard free public API
+Usage	Must not be used in business workflows, commercial products or services.
+Request rate	4 lookups / min
+Daily quota	500 lookups / day
+Monthly quota	15.5 K lookups / month
