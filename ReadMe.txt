@@ -61,7 +61,7 @@ Project Setup Guide
 6. Create a `.env` File
 
     Create a `.env` file in your project directory. Add configuration 
-    settings and secrets here. This will be sued to store the api
+    settings and secrets here. This will be used to store the api
     for VirusTotal.
         my_api_key="YOUR_API_KEY_HERE"
 
