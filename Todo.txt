@@ -1,0 +1,3 @@
+Build Gui 
+Add rescan option to VirusTotal
+Find new APIs for detecting phishing
