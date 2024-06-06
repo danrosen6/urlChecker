@@ -1,3 +1,4 @@
 Build Gui 
 Add rescan option to VirusTotal
+Display engines that have malicious or suspiscious results
 Find new APIs for detecting phishing

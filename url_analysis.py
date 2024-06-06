@@ -6,7 +6,7 @@ import socket
 from bs4 import BeautifulSoup
 
 def analyze_url(url):
-    print("Starting URL Analysis...")
+    print("\nStarting URL Analysis...")
     print("URL:", url)
 
     # Parse the URL to extract components like scheme, netloc, and path
