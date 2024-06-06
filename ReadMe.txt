@@ -72,6 +72,15 @@ Project Setup Guide
     Can be acquired here
     https://www.virustotal.com/gui/my-apikey
 
+    VirusTotal API Information
+    
+        Type: Standard free public API
+        Usage Restrictions: Must not be used in business workflows, 
+            commercial products, or services.
+        Request Rate: 4 lookups per minute
+        Daily Quota: 500 lookups per day
+        Monthly Quota: 15,500 lookups per month
+
 7. Running Your Application
 
     With the virtual environment activated, change directory to src and 
@@ -83,11 +92,3 @@ Project Setup Guide
     For this specific project, start with:
         python main.py
 
-VirusTotal API Information
-
-    Type: Standard free public API
-    Usage Restrictions: Must not be used in business workflows, 
-        commercial products, or services.
-    Request Rate: 4 lookups per minute
-    Daily Quota: 500 lookups per day
-    Monthly Quota: 15,500 lookups per month
