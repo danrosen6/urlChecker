@@ -81,25 +81,44 @@ def summarize_analysis(json_data, headers, attempt):
         # Handle missing keys in JSON response, which might indicate changes in API response structure.
         print(f"Missing key in JSON data: {e}")
 
-'''def prompt_for_detail():
+def rescan_url(analysis_id, headers):
     """
-    Prompt the user to decide if they want a more detailed report.
-    Return True if the user wants more details, False otherwise.
+    Rescan the URL using the given analysis ID.
     """
-    while True:
-        user_input = input("Do you want a more detailed report? (y/n): ").lower()
-        if user_input == 'y':
-            return True
-        elif user_input == 'n':
-            return False
+    rescan_url = f"https://www.virustotal.com/api/v3/urls/{analysis_id}/analyse"
+    try:
+        response = requests.post(rescan_url, headers=headers)
+        if response.status_code == 200:
+            print("URL rescan initiated successfully.")
+            time.sleep(15)  # Wait for the rescan to complete
+            return fetch_analysis_results(analysis_id, headers, 1)
         else:
-            print("Invalid input, please enter 'y' or 'n'.")'''
+            print(f"Failed to initiate rescan: {response.status_code}")
+            return None
+    except RequestException as e:
+        print(f"An error occurred during rescan: {e}")
+        return None
+
 
 def display_detailed_report(results):
     """
-    Displays a detailed report based on the results dictionary provided by the analysis.
-    Each antivirus engine result is listed with its category and detection result.
+    Displays a detailed report focusing on malicious or suspicious findings. If no such findings exist,
+    the user is prompted to display all engines' results.
     """
     print("Detailed Report:")
+    has_warnings = False
+
+    # First, display only malicious or suspicious results
     for engine, details in results.items():
-        print(f"{engine}: Category - {details['category']}, Result - {details['result']}")
+        if details['category'] in ['malicious', 'suspicious']:
+            has_warnings = True
+            print(f"{engine}: Category - {details['category']}, Result - {details['result']}")
+
+    if not has_warnings:
+        print("No malicious or suspicious results found.")
+    
+    # Ask user if they want to see results from all engines
+    print("\nDo you want to see results from all engines? (y/n): ")
+    if prompt_to_continue():
+        for engine, details in results.items():
+            print(f"{engine}: Category - {details['category']}, Result - {details['result']}")
