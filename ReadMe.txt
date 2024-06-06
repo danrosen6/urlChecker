@@ -1,3 +1,6 @@
+Python project to analyze URLs for phishing scams.
+
+
 Project Setup Guide
 
 1. Install Virtual Environment
@@ -64,6 +67,9 @@ Project Setup Guide
     settings and secrets here. This will be used to store the api
     for VirusTotal.
         my_api_key="YOUR_API_KEY_HERE"
+
+    Can be acquired here
+    https://www.virustotal.com/gui/my-apikey
 
 7. Running Your Application
 
