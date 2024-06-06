@@ -73,11 +73,11 @@ Project Setup Guide
 
 7. Running Your Application
 
-    With the virtual environment activated, run Python scripts as follows.
-    This ensures that the script uses the correct environment settings:
+    With the virtual environment activated, change directory to src and 
+    run Python scripts as follows. This ensures that the script uses the 
+    correct environment settings:
 
-    Example:
-    python fileName.py
+    cd src
 
     For this specific project, start with:
         python main.py
