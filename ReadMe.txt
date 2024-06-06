@@ -57,9 +57,10 @@ Project Setup Guide
     Install all required dependencies using the following command:
         pip install -r requirements.txt
 
-    To generate a `requirements.txt` file that lists all current 
-    project dependencies, run:
-        pip freeze > requirements.txt
+    note:
+        To generate a `requirements.txt` file that lists all current 
+        project dependencies, run:
+            pip freeze > requirements.txt
 
 6. Create a `.env` File
 
