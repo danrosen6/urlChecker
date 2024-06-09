@@ -64,13 +64,13 @@ Project Setup Guide
 
 6. Create a `.env` File
 
+    https://www.virustotal.com/gui/my-apikey
+    https://ipinfo.io/developers
     Create a `.env` file in your project directory. Add configuration 
     settings and secrets here. This will be used to store the api
-    for VirusTotal.
-        my_api_key="YOUR_API_KEY_HERE"
-
-    Can be acquired here
-    https://www.virustotal.com/gui/my-apikey
+    for VirusTotal and IPinfo.
+        vt_key ="YOUR_API_KEY_HERE"
+        ip_info_key = "YOUR_API_KEY_HERE"        
 
     VirusTotal API Information
     

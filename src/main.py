@@ -1,85 +1,87 @@
 import sys
+import threading
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton, QLabel
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QTimer, Signal
 from url_analysis import analyze_url
 from virus_total_analysis import initiate_virus_total_analysis
-import threading
 
+# Define the main window class for the URL checker application.
 class URLCheckerWindow(QMainWindow):
-    report_ready_signal = Signal(str)  # Custom signal for updating the GUI with results from background thread
+    # Define a custom signal for communicating virus total analysis completion.
+    virus_total_complete_signal = Signal(str)
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("URL Checker")  # Set the window title
-        self.setGeometry(300, 300, 500, 300)  # Set the window position and size
-        self.setMaximumWidth(700)  # Set the maximum width of the window
+        self.setWindowTitle("URL Checker")  # Set the window title.
+        self.setGeometry(300, 300, 500, 500)  # Set the window position and size.
 
-        central_widget = QWidget(self)  # Main widget that holds other widgets
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)  # Layout manager to arrange widgets vertically
+        central_widget = QWidget(self)  # Create a central widget.
+        self.setCentralWidget(central_widget)  # Set the central widget of the window.
+        layout = QVBoxLayout(central_widget)  # Create a vertical layout for the widgets.
 
-        # URL input field
-        self.url_input = QLineEdit(self)
-        # Button to trigger URL checking
-        self.check_button = QPushButton("Check URL", self)
-        # Label to display results of URL analysis
-        self.results_text = QLabel("", self)
-        self.results_text.setWordWrap(True)
-        # Button to initiate VirusTotal analysis
-        self.virus_total_button = QPushButton("Analyze with VirusTotal", self)
-        # Label to display results from VirusTotal analysis
-        self.virus_total_results = QLabel("", self)
+        self.url_input = QLineEdit(self)  # Text input field for URLs.
+        self.check_button = QPushButton("Check URL", self)  # Button to trigger URL check.
+        self.results_text = QLabel("", self)  # Label to display the results of URL check.
+        self.results_text.setWordWrap(True)  # Enable word wrapping for the label.
+
+        self.virus_total_button = QPushButton("Analyze with VirusTotal", self)  # Button for VirusTotal analysis.
+        self.virus_total_results = QLabel("", self)  # Label to display VirusTotal analysis results.
         self.virus_total_results.setWordWrap(True)
-        # Label for showing countdown or status messages
-        self.countdown_label = QLabel("Ready", self)
+        self.virus_total_timer = QTimer(self)  # Timer for handling analysis countdown.
+        self.virus_total_timer.setInterval(1000)  # Timer interval set to 1 second.
+        self.virus_total_time_left = 15  # Initial time left for analysis countdown.
 
-        # Adding widgets to the layout
+        # Add widgets to the layout.
         layout.addWidget(QLabel("Enter the URL:"))
         layout.addWidget(self.url_input)
         layout.addWidget(self.check_button)
         layout.addWidget(self.results_text)
         layout.addWidget(self.virus_total_button)
         layout.addWidget(self.virus_total_results)
-        layout.addWidget(self.countdown_label)
 
-        # Connecting button clicks to corresponding methods
+        # Connect button click events to their respective methods.
         self.check_button.clicked.connect(self.check_url)
-        self.virus_total_button.clicked.connect(self.start_virus_total_analysis)
-        self.report_ready_signal.connect(self.update_results)
+        self.virus_total_button.clicked.connect(lambda: self.start_analysis(
+            self.virus_total_button, self.virus_total_timer, 
+            initiate_virus_total_analysis, self.virus_total_complete_signal, 'virus_total'))
 
-        # Timer for countdown during analysis
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_timer)
-        self.duration = 15  # Duration of the countdown
+        # Connect the signal to update the results when analysis is complete.
+        self.virus_total_complete_signal.connect(lambda report: self.update_results(report, self.virus_total_results))
 
-    def update_timer(self):
-        # Update the countdown every second, stop timer and update label when done
-        if self.duration > 0:
-            self.duration -= 1
-            self.countdown_label.setText(f"{self.duration} seconds remaining")
+    # Method to start the URL analysis process.
+    def start_analysis(self, button, timer, analysis_func, signal, timer_type):
+        url = self.url_input.text()
+        button.setEnabled(False)
+        update_func = lambda: self.update_countdown(button, timer, timer_type)
+        timer.timeout.connect(update_func)
+        timer.start()
+        threading.Thread(target=analysis_func, args=(url, signal.emit), daemon=True).start()
+        self.virus_total_update_func = update_func
+
+    # Method to update the countdown of the analysis timer.
+    def update_countdown(self, button, timer, timer_type):
+        self.virus_total_time_left -= 1
+        time_left = self.virus_total_time_left
+
+        if time_left <= 0:
+            timer.stop()
+            timer.timeout.disconnect(self.virus_total_update_func)
+            button.setEnabled(True)
+            button.setText("Analyze")
         else:
-            self.timer.stop()
-            self.countdown_label.setText("Waiting for results...")
+            button.setText(f"Analyzing... ({time_left}s)")
 
+    # Method to display analysis results in the label.
+    def update_results(self, report, label):
+        label.setText(report)
+
+    # Method to check the URL when the check button is clicked.
     def check_url(self):
-        # Get URL from input, analyze it, and display the result
         url = self.url_input.text()
         result = analyze_url(url)
         self.results_text.setText(result)
 
-    def start_virus_total_analysis(self):
-        # Start VirusTotal analysis in a separate thread to keep UI responsive
-        url = self.url_input.text()
-        self.duration = 15  # Reset the countdown
-        self.timer.start(1000)  # Start the timer, triggering it every second
-        threading.Thread(target=initiate_virus_total_analysis, args=(url, self.report_ready_signal.emit), daemon=True).start()
-
-    def update_results(self, report):
-        # Update the GUI with the results from the VirusTotal analysis
-        self.virus_total_results.setText(report)
-        self.timer.stop()
-        self.countdown_label.setText("Analysis complete!")
-
+# Entry point of the application.
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = URLCheckerWindow()
