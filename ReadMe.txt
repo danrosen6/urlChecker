@@ -81,6 +81,10 @@ Project Setup Guide
         Daily Quota: 500 lookups per day
         Monthly Quota: 15,500 lookups per month
 
+    ipinfo
+        Free usage of our API is limited to 50,000 API requests per month.
+        If you exceed that limit, we'll return a 429 HTTP status code to you.
+        
 7. Running Your Application
 
     With the virtual environment activated, change directory to src and 
