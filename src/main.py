@@ -43,40 +43,47 @@ class URLCheckerWindow(QMainWindow):
         self.check_button.clicked.connect(self.check_url)
         self.virus_total_button.clicked.connect(lambda: self.start_analysis(
             self.virus_total_button, self.virus_total_timer, 
-            initiate_virus_total_analysis, self.virus_total_complete_signal, 'virus_total'))
+            initiate_virus_total_analysis, self.virus_total_complete_signal))
 
         # Connect the signal to update the results when analysis is complete.
         self.virus_total_complete_signal.connect(lambda report: self.update_results(report, self.virus_total_results))
 
-    # Method to start the URL analysis process.
-    def start_analysis(self, button, timer, analysis_func, signal, timer_type):
+    def start_analysis(self, button, timer, analysis_func, signal):
+        # Start URL analysis and manage timer for countdown
         url = self.url_input.text()
-        button.setEnabled(False)
-        update_func = lambda: self.update_countdown(button, timer, timer_type)
+        self.reset_timer(timer, button)  # Reset the timer and button state before starting
+        update_func = lambda: self.update_countdown(button, timer)
         timer.timeout.connect(update_func)
         timer.start()
         threading.Thread(target=analysis_func, args=(url, signal.emit), daemon=True).start()
         self.virus_total_update_func = update_func
 
-    # Method to update the countdown of the analysis timer.
-    def update_countdown(self, button, timer, timer_type):
+    def reset_timer(self, timer, button):
+        timer.stop()
+        if timer.isActive():  # Check if the timer is active before attempting to disconnect
+            timer.timeout.disconnect()  # Disconnect all connections to avoid multiple triggers
+        self.virus_total_time_left = 15  # Reset the countdown
+        button.setText("Analyze with VirusTotal")
+
+    def update_countdown(self, button, timer):
+        # Update the countdown and modify button text accordingly
         self.virus_total_time_left -= 1
         time_left = self.virus_total_time_left
-
         if time_left <= 0:
             timer.stop()
-            timer.timeout.disconnect(self.virus_total_update_func)
+            if timer.isActive():
+                timer.timeout.disconnect(self.virus_total_update_func)
             button.setEnabled(True)
-            button.setText("Analyze")
+            button.setText("Analyze with VirusTotal")
         else:
             button.setText(f"Analyzing... ({time_left}s)")
 
-    # Method to display analysis results in the label.
     def update_results(self, report, label):
+        # Display analysis results in the designated label
         label.setText(report)
 
-    # Method to check the URL when the check button is clicked.
     def check_url(self):
+        # Check the URL by calling analyze_url and display results
         url = self.url_input.text()
         result = analyze_url(url)
         self.results_text.setText(result)
