@@ -64,16 +64,14 @@ Project Setup Guide
 
 6. Create a `.env` File
 
-    https://www.virustotal.com/gui/my-apikey
-    https://ipinfo.io/developers
     Create a `.env` file in your project directory. Add configuration 
     settings and secrets here. This will be used to store the api
     for VirusTotal and IPinfo.
-        vt_key ="YOUR_API_KEY_HERE"
-        ip_info_key = "YOUR_API_KEY_HERE"        
+        vt_key ='YOUR_API_KEY_HERE' 
+        ip_info_key = 'YOUR_API_KEY_HERE'      
 
     VirusTotal API Information
-    
+    https://www.virustotal.com/gui/my-apikey
         Type: Standard free public API
         Usage Restrictions: Must not be used in business workflows, 
             commercial products, or services.
@@ -82,9 +80,10 @@ Project Setup Guide
         Monthly Quota: 15,500 lookups per month
 
     ipinfo
+    https://ipinfo.io/developers
         Free usage of our API is limited to 50,000 API requests per month.
         If you exceed that limit, we'll return a 429 HTTP status code to you.
-        
+
 7. Running Your Application
 
     With the virtual environment activated, change directory to src and 
